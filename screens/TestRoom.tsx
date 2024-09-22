@@ -1,38 +1,87 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, Pressable, Button } from 'react-native'
+import React, { useCallback, useMemo, useRef, useState } from 'react'
 import PagerView from 'react-native-pager-view';
 import CountDown from '../components/CountDown';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { useAppSelector } from '../services/redux/hooks';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+
+import {
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetModalProvider,
+} from '@gorhom/bottom-sheet';
+import { ScrollView } from 'react-native-gesture-handler';
+
 
 const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
   const { id } = route.params;
+  const { data, isLoading, error } = useAppSelector((state) => state.mockTest)
+  const mockTestId = data?.id
+  const mockTestName = data?.testName
+  const mockTestQuestions = data?.questions
+  const mockTestDuration = data?.duration
+  const [attempted, setAttempted] = useState<any>([])
+
+  const handleOptionClick = (questionId: any, optionId: any) => {
+    setAttempted((prev: any) => {
+      const existingIndex = prev.findIndex((item: any) => item.questionId === questionId && item.optionId === optionId);
+      if (existingIndex !== -1) {
+        return prev.filter((item: any) => item.questionId !== questionId || item.optionId !== optionId);
+      } else {
+        const updated = prev.filter((item: any) => item.questionId !== questionId);
+        return [...updated, { questionId, optionId }];
+      }
+    });
+  };
+
+
   const handleComplete = () => {
-    console.log('completed');
-    navigation.navigate('Tests');
+    console.log('completed', attempted);
+    // navigation.navigate('Tests');
   }
 
-  const { data, isLoading, error } = useAppSelector((state) => state.questions)
-  const testName = data?.testName
-  const questions = data?.questions
+
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const snapPoints = useMemo(() => ['25%', '50%'], []);
+
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log('handleSheetChanges', index);
+  }, []);
+
 
   return (
     <View style={styles.container}>
+
       <View style={styles.headerContainer}>
-        <View style={styles.pause}>
-          <FontAwesome6 name="pause" size={28} color="#E0115F" />
+
+        <View style={styles.detailsContainer}>
+          <View style={styles.pause}>
+            <FontAwesome6 name="pause" size={28} color="#E0115F" />
+          </View>
+          <View style={styles.timerContainer}>
+            <CountDown
+              timeLimit={mockTestDuration}
+              onComplete={handleComplete}
+              subject={mockTestName}
+            />
+          </View>
         </View>
-        <View style={styles.timerContainer}>
-          <CountDown
-            timeLimit={100}
-            onComplete={handleComplete}
-            subject={testName}
-          />
+
+
+        <View style={styles.sheetOpen}>
+          <Pressable onPress={handlePresentModalPress}>
+            <FontAwesome5 name="grip-horizontal" size={28} color="#E0115F" />
+          </Pressable>
         </View>
+
       </View>
 
       <PagerView style={styles.pagerViewContainer} initialPage={0}>
-        {questions?.map((ques: any, questionIndex: number) => {
+        {mockTestQuestions?.map((ques: any, questionIndex: number) => {
           return (
             <View key={questionIndex} style={styles.pagerViewContainer}>
               <View style={styles.questionHeadingContainer}>
@@ -44,12 +93,15 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
               </View>
               <View style={styles.optionContainer}>
                 {
-                  ques.options.map((option: any, optionIndex: number) => {
+                  ques?.options?.map((option: any, optionIndex: number) => {
+                    const isSelected = attempted.find((item: any) => item?.questionId === ques?.id && item?.optionId === option?.id);
                     return (
-                      <View key={optionIndex} style={styles.option}>
-                        <Text style={styles.optionNumber}>{['A', 'B', 'C', 'D'][optionIndex]}</Text>
-                        <Text style={styles.optionText}>{option.text}</Text>
-                      </View>
+                      <Pressable key={optionIndex} onPress={() => { handleOptionClick(ques?.id, option?.id); }}>
+                        <View style={[isSelected ? styles.selectedOption : styles.option]}>
+                          <Text style={styles.optionNumber}>{['A', 'B', 'C', 'D'][optionIndex]}</Text>
+                          <Text style={isSelected ? styles.selectedOptionText : styles.optionText}>{option.text}</Text>
+                        </View>
+                      </Pressable>
                     )
                   })
                 }
@@ -58,6 +110,29 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
           )
         })}
       </PagerView>
+
+      <BottomSheetModalProvider>
+        <View style={styles.bsContainer}>
+          <BottomSheetModal
+            ref={bottomSheetModalRef}
+            index={1}
+            snapPoints={snapPoints}
+            onChange={handleSheetChanges}
+            backgroundStyle={styles.modalBackground}
+          >
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <BottomSheetView style={styles.bsItemContainer}>
+                {Array.from({ length: 100 }, (_, index) => (
+                  <View key={index} style={styles.bsItem}>
+                    <Text>{index + 1}</Text>
+                  </View>
+                ))}
+              </BottomSheetView>
+            </ScrollView>
+          </BottomSheetModal>
+        </View>
+      </BottomSheetModalProvider>
+
     </View>
   )
 }
@@ -66,19 +141,28 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
   },
   headerContainer: {
     marginTop: 60,
     flexDirection: 'row',
     padding: 5,
     borderBottomWidth: 0.5,
+    justifyContent: 'space-between'
+  },
+  detailsContainer: {
+    flexDirection: 'row'
   },
   pause: {
     padding: 12,
+    justifyContent: 'space-evenly',
   },
   timerContainer: {
     padding: 10,
+  },
+  sheetOpen: {
+    padding: 12,
+    justifyContent: 'space-evenly',
   },
   pagerViewContainer: {
     flex: 1,
@@ -123,8 +207,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     borderRadius: 8,
     padding: 12,
+    marginBottom: 14,
+  },
+  selectedOption: {
+    flexDirection: 'row',
+    display: 'flex',
+    alignItems: 'center',
+    backgroundColor: '#E0115F',
+    borderRadius: 8,
+    padding: 12,
     marginBottom: 14
   },
+
   optionNumber: {
     backgroundColor: 'white',
     textAlign: 'center',
@@ -136,6 +230,38 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 14,
     marginStart: 10,
+  },
+  selectedOptionText: {
+    color: 'white',
+    fontSize: 14,
+    marginStart: 10,
+  },
+  bsContainer: {
+    flex: 1
+  },
+  modalBackground: {
+    elevation: 25,
+    borderWidth: 0.5,
+    borderColor: '#E5E4E2'
+  },
+  bsItemContainer: {
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    padding: 10,
+  },
+  bsItem: {
+    width: '10%',
+    height: 40,
+    borderWidth: 0.5,
+    borderRadius: 5,
+    borderColor: 'red',
+    margin: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+
   },
 });
 

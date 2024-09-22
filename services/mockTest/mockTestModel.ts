@@ -2,11 +2,11 @@ import apiProvider from "./apiProvider"
 
 const ApiProvider = new apiProvider()
 
-export default class questions {
+export default class mockTestModel {
 
- fetchAll = async (): Promise<any> => {
+ fetchOne = async (): Promise<any> => {
   try {
-   const response = await ApiProvider.testQuestions();
+   const response = await ApiProvider.mockTest()
    await new Promise(resolve => setTimeout(resolve, 3000));
    return response
   } catch (error) {

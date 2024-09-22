@@ -2,16 +2,16 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { useNavigation, RouteProp } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../services/redux/hooks';
-import { fetchQuestions } from '../services/redux/slices/questionSlice';
+import { fetchMockTest } from '../services/redux/slices/mockTestSlice';
 
 const Instructions = ({ route }: {route:any}) => {
   const navigation:any = useNavigation();
   const { id } = route.params;
   const dispatch = useAppDispatch();
-  const questions = useAppSelector((state) => state.questions)
+  const questions = useAppSelector((state) => state.mockTest)
 
   const onConfirm = async () => {
-    await dispatch(fetchQuestions())
+    await dispatch(fetchMockTest())
     navigation.navigate('TestRoom', { id });
   };
 

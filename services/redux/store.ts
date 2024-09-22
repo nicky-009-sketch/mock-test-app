@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { questionsReducer } from './slices/questionSlice'
+import { mockTestReducer } from './slices/mockTestSlice'
 
 export const store = configureStore({
   reducer: {
-    questions: questionsReducer,
+    mockTest: mockTestReducer,
   },
 })
 
