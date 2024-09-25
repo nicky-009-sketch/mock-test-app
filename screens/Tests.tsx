@@ -1,14 +1,17 @@
-import { View, StyleSheet, Alert, Text } from 'react-native'
-import React, { useState } from 'react'
+import { View, StyleSheet, Alert, Text, Pressable } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import TabTop from '../components/TabTop'
 import { SceneMap } from 'react-native-tab-view';
 import Test from '../components/Test';
 import ModalConfirm from '../components/modals/ModalConfirm';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { useNavigation } from '@react-navigation/native';
+import { useAppDispatch, useAppSelector } from '../services/redux/hooks';
+import { fetchExams } from '../services/redux/slices/examSlice';
 
 const Tests = () => {
-  const navigation:any = useNavigation();
+  const dispatch = useAppDispatch()
+  const navigation: any = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedId, setSelectedId] = useState<any>(null);
 
@@ -21,40 +24,27 @@ const Tests = () => {
   const handleConfirm = () => {
     // console.log('OK Pressed', selectedId
     setModalVisible(false);
-    navigation.navigate('Instructions',  { id: selectedId });
+    navigation.navigate('Instructions', { id: selectedId });
   };
 
-  const routes = [
-    { key: 'ssc_cgl', title: 'SSC CGL' },
-    { key: 'ssc_chsl', title: 'SSC CHSL' },
-    { key: 'ssc_je_ce', title: 'SSC JE CE' },
-    { key: 'ssc_je_ee', title: 'SSC JE EE' },
-    { key: 'ssc_je_me', title: 'SSC JE ME' },
-    { key: 'ssc_sa', title: 'SSC SA' },
-    { key: 'ssc_mts', title: 'SSC MTS' },
-    { key: 'ssc_cpo', title: 'SSC CPO' },
-  ]
-  const SSC_CGL = () => <Test data={testData} handleStart={handleStart} />;
-  const SSC_CHSL = () => <View style={{ flex: 1, backgroundColor: '#673ab7' }} />;
-  const SSC_JE_CE = () => <View style={{ flex: 1, backgroundColor: 'gray' }} />;
-  const SSC_JE_EE = () => <View style={{ flex: 1, backgroundColor: 'gray' }} />;
-  const SSC_JE_ME = () => <View style={{ flex: 1, backgroundColor: 'gray' }} />;
-  const SSC_SA = () => <View style={{ flex: 1, backgroundColor: 'gray' }} />;
-  const SSC_MTS = () => <View style={{ flex: 1, backgroundColor: 'gray' }} />;
-  const SSC_CPO = () => <View style={{ flex: 1, backgroundColor: 'gray' }} />;
 
-  const renderScene = SceneMap({
-    ssc_cgl: SSC_CGL,
-    ssc_chsl: SSC_CHSL,
-    ssc_je_ce: SSC_JE_CE,
-    ssc_je_ee: SSC_JE_EE,
-    ssc_je_me: SSC_JE_ME,
-    ssc_sa: SSC_SA,
-    ssc_mts: SSC_MTS,
-    ssc_cpo: SSC_CPO,
-  });
+  const { data, isLoading, error } = useAppSelector((state) => state.exams)
+  const routes = data?.routes || [];
 
-  const testData = [
+
+  const renderScene = SceneMap(
+    Object.fromEntries(
+      routes?.map((item: any) => [
+        item.key,
+        () => <Test
+          data={testData1}
+          handleStart={handleStart}
+        />
+      ])
+    )
+  );
+
+  const testData1 = [
     { id: 1, title: 'SSC CGL Math Quiz', questions: 90, duration: 90, marks: 90, subject: 'QUANT' },
     { id: 2, title: 'SSC CGL Math Quiz', questions: 90, duration: 90, marks: 90, subject: 'REASONING' },
     { id: 3, title: 'SSC CGL Math Quiz', questions: 90, duration: 90, marks: 90, subject: 'GK' },
@@ -64,10 +54,26 @@ const Tests = () => {
     { id: 7, title: 'SSC CGL Math Quiz', questions: 90, duration: 90, marks: 90, subject: 'ENGLISH' },
   ]
 
+  const handleTabChange = (id: any) => {
+    console.log(id)
+  }
+
+
+
+  useEffect(() => {
+    const getData = async () => {
+      await dispatch(fetchExams())
+    }
+    getData();
+  }, [])
 
   return (
     <View style={styles.container}>
-      <TabTop renderScene={renderScene} route={routes} />
+      {data && <TabTop
+        renderScene={renderScene}
+        route={routes}
+        handleTabChange={handleTabChange}
+      />}
       <View>
         <ModalConfirm
           visible={modalVisible}
@@ -76,7 +82,13 @@ const Tests = () => {
           title='Ready to start ?'
           message={
             <Text>
-              Pay 20 <FontAwesome5 name="coins" size={14} color="#d3af37" /> Conins
+              Pay 20
+              <FontAwesome5
+                name="coins"
+                size={14}
+                color="#d3af37"
+              />
+              Conins
             </Text>
           }
           confirmActionText='Start'

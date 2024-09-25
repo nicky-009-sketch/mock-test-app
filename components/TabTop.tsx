@@ -3,7 +3,7 @@ import { View, useWindowDimensions, StyleSheet, Text, Dimensions } from 'react-n
 import { TabView,  TabBar } from 'react-native-tab-view';
 const { width } = Dimensions.get('window');
 
-const TabTop:React.FC<{renderScene:any, route:any}> = ({renderScene, route}) => {
+const TabTop:React.FC<{renderScene:any, route:any, handleTabChange:any}> = ({renderScene, route, handleTabChange}) => {
  const layout = useWindowDimensions();
  const [index, setIndex] = useState(0);
  const [routes] = useState([...route])
@@ -22,7 +22,10 @@ const TabTop:React.FC<{renderScene:any, route:any}> = ({renderScene, route}) => 
  return (
   <TabView
    navigationState={{ index, routes }}
-   onIndexChange={setIndex}
+   onIndexChange={(index) => {
+    setIndex(index);
+    handleTabChange(routes[index].key);
+  }}
    renderScene={renderScene}
    renderTabBar={renderTabBar}
    initialLayout={{ width: layout.width }}
