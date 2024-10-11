@@ -22,6 +22,7 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
   const mockTestQuestions = data?.questions
   const mockTestDuration = data?.duration
   const [attempted, setAttempted] = useState<any>([])
+  const [initialPage, setInitialPage] = useState<number>(0)
 
   const handleOptionClick = (questionId: any, optionId: any) => {
     setAttempted((prev: any) => {
@@ -35,16 +36,33 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
     });
   };
 
-
   const handleComplete = () => {
     console.log('completed', attempted);
     // navigation.navigate('Tests');
   }
 
+  const pagerRef: any = useRef(null);
+  const handleResponse = (payLoad: any) => {
+    if (payLoad?.type === 'next') {
+      if (pagerRef.current) {
+        pagerRef.current.setPage(payLoad.id);
+      }
+    }
+    if (payLoad?.type === 'submit') {
+      console.log('submit', attempted)
+    }
+    if (payLoad?.type === 'clear') {
+      console.log('clear')
+    }
+
+  }
+
+
+
+
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ['25%', '50%'], []);
-
   const handlePresentModalPress = useCallback(() => {
     bottomSheetModalRef.current?.present();
   }, []);
@@ -57,7 +75,6 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
     <View style={styles.container}>
 
       <View style={styles.headerContainer}>
-
         <View style={styles.detailsContainer}>
           <View style={styles.pause}>
             <FontAwesome6 name="pause" size={28} color="#E0115F" />
@@ -70,17 +87,14 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
             />
           </View>
         </View>
-
-
         <View style={styles.sheetOpen}>
           <Pressable onPress={handlePresentModalPress}>
             <FontAwesome5 name="grip-horizontal" size={28} color="#E0115F" />
           </Pressable>
         </View>
-
       </View>
 
-      <PagerView style={styles.pagerViewContainer} initialPage={0}>
+      <PagerView style={styles.pagerViewContainer} initialPage={0} ref={pagerRef}>
         {mockTestQuestions?.map((ques: any, questionIndex: number) => {
           return (
             <View key={questionIndex} style={styles.pagerViewContainer}>
@@ -105,6 +119,29 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
                     )
                   })
                 }
+              </View>
+              <View style={styles.buttonContainer}>
+                <Pressable
+                  style={styles.clearButton}
+                  onPress={() => { handleResponse({ type: 'clear', id: ques?.id }) }}
+                >
+                  <Text style={styles.clearText}>
+                    Clear Response
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={styles.submitButton}
+                  onPress={() => {
+                    handleResponse({
+                      type: mockTestQuestions?.length === questionIndex + 1 ? 'submit' : 'next',
+                      id: ques?.id
+                    })
+                  }}
+                >
+                  <Text style={styles.submitText}>
+                    {mockTestQuestions?.length === questionIndex + 1 ? 'Submit' : 'Next'}
+                  </Text>
+                </Pressable>
               </View>
             </View>
           )
@@ -148,6 +185,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 5,
     borderBottomWidth: 0.5,
+    borderBottomColor: 'gray',
     justifyContent: 'space-between'
   },
   detailsContainer: {
@@ -166,7 +204,7 @@ const styles = StyleSheet.create({
   },
   pagerViewContainer: {
     flex: 1,
-    padding: 16
+    padding: 16,
   },
   questionHeadingContainer: {
     flexDirection: 'row',
@@ -236,8 +274,41 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginStart: 10,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderTopWidth: 0.5,
+    borderTopColor: 'gray',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  submitButton: {
+    flex: 1,
+    marginLeft: 8,
+    padding: 8,
+    alignItems: 'center',
+    borderRadius: 4,
+    backgroundColor: '#f44336',
+  },
+  submitText: {
+    color: 'white',
+  },
+  clearButton: {
+    flex: 1,
+    marginRight: 8,
+    borderWidth: 0.2,
+    padding: 8,
+    alignItems: 'center',
+    borderRadius: 4,
+  },
+  clearText: {
+    color: 'blue',
+  },
   bsContainer: {
-    flex: 1
+    // flex: 1
   },
   modalBackground: {
     elevation: 25,

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import examModel from '../../exam/examModel';
+import examModel from '../../exams/examModel';
 const exmModel = new examModel();
 
 export const fetchExams = createAsyncThunk(

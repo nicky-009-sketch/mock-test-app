@@ -8,72 +8,75 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { useNavigation } from '@react-navigation/native';
 import { useAppDispatch, useAppSelector } from '../services/redux/hooks';
 import { fetchExams } from '../services/redux/slices/examSlice';
+import { fetchMockList } from '../services/redux/slices/mockTestSlice';
 
 const Tests = () => {
   const dispatch = useAppDispatch()
   const navigation: any = useNavigation();
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedId, setSelectedId] = useState<any>(null);
+  const [selectedTest, setSelectedTest] = useState<any>(null);
 
-  const handleStart = (id: number | string) => {
-    // console.log('start clicked', id);
-    setSelectedId(id);
+  const { data: examData, isLoading: examLoading, error: examError } = useAppSelector((state) => state.exams);
+  const routes = examData?.routes || [];
+  const { data: mockTestData, isLoading: isMockTestLoading, error: mockTestError } = useAppSelector((state) => state.mockTest);
+  const mockTestList = mockTestData?.listData || []
+
+
+  const handleStart = (testItem: any) => {
+    setSelectedTest(testItem)
     setModalVisible(true);
   };
 
   const handleConfirm = () => {
-    // console.log('OK Pressed', selectedId
     setModalVisible(false);
-    navigation.navigate('Instructions', { id: selectedId });
+    navigation.navigate('Instructions', { selectedTest:selectedTest });
   };
 
 
-  const { data, isLoading, error } = useAppSelector((state) => state.exams)
-  const routes = data?.routes || [];
+  const handleTabChange = async (id: any) => {
+    const examId = id;
+    await dispatch(fetchMockList(examId))
+  }
 
+  const refreshMockTestList = async (examId: any) => {
+    await dispatch(fetchMockList(examId)); // Fetch mock tests for the selected exam
+  };
 
   const renderScene = SceneMap(
     Object.fromEntries(
       routes?.map((item: any) => [
         item.key,
         () => <Test
-          data={testData1}
+          data={mockTestList}
           handleStart={handleStart}
+          isLoading={isMockTestLoading}
+          refreshData={() => refreshMockTestList(item.key)}
         />
       ])
     )
   );
 
-  const testData1 = [
-    { id: 1, title: 'SSC CGL Math Quiz', questions: 90, duration: 90, marks: 90, subject: 'QUANT' },
-    { id: 2, title: 'SSC CGL Math Quiz', questions: 90, duration: 90, marks: 90, subject: 'REASONING' },
-    { id: 3, title: 'SSC CGL Math Quiz', questions: 90, duration: 90, marks: 90, subject: 'GK' },
-    { id: 4, title: 'SSC CGL Math Quiz', questions: 90, duration: 90, marks: 90, subject: 'QUANT' },
-    { id: 5, title: 'SSC CGL Math Quiz', questions: 90, duration: 90, marks: 90, subject: 'ENGLISH' },
-    { id: 6, title: 'SSC CGL Math Quiz', questions: 90, duration: 90, marks: 90, subject: 'QUANT' },
-    { id: 7, title: 'SSC CGL Math Quiz', questions: 90, duration: 90, marks: 90, subject: 'ENGLISH' },
-  ]
-
-  const handleTabChange = (id: any) => {
-    console.log(id)
-  }
-
-
-
   useEffect(() => {
     const getData = async () => {
-      await dispatch(fetchExams())
-    }
+      await dispatch(fetchExams());
+      if (routes.length > 0) {
+        await dispatch(fetchMockList(routes[0].key));
+      }
+    };
     getData();
-  }, [])
+  }, [routes.length]);
+
 
   return (
     <View style={styles.container}>
-      {data && <TabTop
-        renderScene={renderScene}
-        route={routes}
-        handleTabChange={handleTabChange}
-      />}
+      {
+        examData &&
+        <TabTop
+          renderScene={renderScene}
+          route={routes}
+          handleTabChange={handleTabChange}
+        />
+      }
       <View>
         <ModalConfirm
           visible={modalVisible}

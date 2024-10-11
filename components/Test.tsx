@@ -1,13 +1,27 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, RefreshControl } from 'react-native';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import { ScrollView } from 'react-native-gesture-handler';
+import Loaders from './Loaders';
 
-const Test: React.FC<{ data: any, handleStart: any }> = ({ data, handleStart }) => {
-
+const Test: React.FC<{ data: any, handleStart: any, isLoading: boolean, refreshData: any }> = ({ data, handleStart, isLoading, refreshData }) => {
+ const { SpinLoader } = Loaders();
+ const [refreshing, setRefreshing] = React.useState(false);
+ if (isLoading) return <SpinLoader />
+ const onRefresh = React.useCallback(() => {
+  setRefreshing(true);
+  setTimeout(() => {
+   refreshData()
+   setRefreshing(false);
+  }, 2000);
+ }, []);
  return (
-  <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-   {data?.map((test: any) => {
+  <ScrollView
+   style={styles.container}
+   showsVerticalScrollIndicator={false}
+   refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+  >
+   {data.length > 0 && data?.map((test: any) => {
     return (
      <View key={test.id} style={styles.wrapper}>
       <View style={styles.information}>
@@ -19,22 +33,22 @@ const Test: React.FC<{ data: any, handleStart: any }> = ({ data, handleStart }) 
        </View>
        <View style={styles.textContainer}>
         <Text style={styles.title}>{test.title}</Text>
-        <Text style={styles.subtitle}>{test.questions} Questions</Text>
+        <Text style={styles.subtitle}>{test.questions}</Text>
         <View style={styles.detailsContainer}>
-         <Text style={styles.detailItem}>• {test.questions} Questions</Text>
-         <Text style={styles.detailItem}>• {test.duration} Mins</Text>
-         <Text style={styles.detailItem}>• {test.marks} Marks</Text>
+         <Text style={styles.detailItem}>• {test.questions}</Text>
+         <Text style={styles.detailItem}>• {test.duration}</Text>
+         <Text style={styles.detailItem}>• {test.totalMarks}</Text>
         </View>
        </View>
       </View>
       <View style={styles.download}>
-       <Pressable onPress={()=>{handleStart(test?.id)}}>
+       <Pressable onPress={() => { handleStart(test) }}>
         <Text style={styles.downloadText}>Start</Text>
        </Pressable>
       </View>
       <View style={styles.coins}>
        <FontAwesome5 name="coins" size={14} color="#d3af37" />
-       <Text style={styles.coinsText}>20</Text>
+       <Text style={styles.coinsText}>{test?.coins}</Text>
       </View>
      </View>
     )

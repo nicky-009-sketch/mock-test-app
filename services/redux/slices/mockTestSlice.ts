@@ -14,6 +14,18 @@ export const fetchMockTest = createAsyncThunk(
   }
 );
 
+export const fetchMockList = createAsyncThunk(
+  'mockTest/fetchMockList',
+  async (examId:string, thunkAPI) => { 
+    try {
+      const response = await mtModel.fetchList(examId); 
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue('Failed to fetchMockList');
+    }
+  }
+);
+
 const initialState: any = {
   data: null,
   isLoading: false,
@@ -35,6 +47,19 @@ const mockTestSlice = createSlice({
         state.isLoading = false;
       })
       .addCase(fetchMockTest.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      // Handling fetchMockList actions
+      .addCase(fetchMockList.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchMockList.fulfilled, (state, action) => {
+        state.data = action.payload;
+        state.isLoading = false;
+      })
+      .addCase(fetchMockList.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
