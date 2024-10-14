@@ -2,26 +2,27 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import mockTestModel from '../../mockTest/mockTestModel';
 const mtModel = new mockTestModel()
 
-export const fetchMockTest = createAsyncThunk(
-  'mockTest/fetchMockTest',
-  async (_, thunkAPI) => {
+export const fetchMockList = createAsyncThunk(
+  'mockTest/fetchMockList',
+  async (examId: string, thunkAPI) => {
     try {
-      const response = await mtModel.fetchOne()
-      return response
+      const response = await mtModel.fetchList(examId);
+      return response;
     } catch (error) {
-      return thunkAPI.rejectWithValue('Failed to fetch questions');
+      return thunkAPI.rejectWithValue('Failed to fetchMockList');
     }
   }
 );
 
-export const fetchMockList = createAsyncThunk(
-  'mockTest/fetchMockList',
-  async (examId:string, thunkAPI) => { 
+
+export const fetchMockTest = createAsyncThunk(
+  'mockTest/fetchMockTest',
+  async (testId: string, thunkAPI) => {
     try {
-      const response = await mtModel.fetchList(examId); 
-      return response;
+      const response = await mtModel.fetchOne(testId)
+      return response
     } catch (error) {
-      return thunkAPI.rejectWithValue('Failed to fetchMockList');
+      return thunkAPI.rejectWithValue('Failed to fetch questions');
     }
   }
 );

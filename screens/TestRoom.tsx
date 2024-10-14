@@ -12,17 +12,24 @@ import {
   BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
 import { ScrollView } from 'react-native-gesture-handler';
+import ModalConfirm from '../components/modals/ModalConfirm';
+import TextTable from '../components/TextTable';
 
 
 const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
-  const { id } = route.params;
+  const { selectedTest } = route.params;
   const { data, isLoading, error } = useAppSelector((state) => state.mockTest)
-  const mockTestId = data?.id
-  const mockTestName = data?.testName
   const mockTestQuestions = data?.questions
-  const mockTestDuration = data?.duration
+  const mockTestName = selectedTest?.title
+  const mockTestDuration = selectedTest?.duration
+
   const [attempted, setAttempted] = useState<any>([])
-  const [initialPage, setInitialPage] = useState<number>(0)
+  const [language, setLanguage] = useState<string | null | undefined>('en')
+  const [modalVisible, setModalVisible] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [confirmText, setConfirtText] = useState<string>('')
+
+  // console.log('attempted', attempted)
 
   const handleOptionClick = (questionId: any, optionId: any) => {
     setAttempted((prev: any) => {
@@ -41,24 +48,49 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
     // navigation.navigate('Tests');
   }
 
+
   const pagerRef: any = useRef(null);
   const handleResponse = (payLoad: any) => {
+    const { questionId, questionIndex, type } = payLoad
+    // console.log('payLoad', payLoad)
+
     if (payLoad?.type === 'next') {
+      const nextIndex = currentIndex + 1;
+      if (nextIndex < mockTestQuestions.length) {
+        if (pagerRef.current) {
+          pagerRef.current?.setPage(nextIndex);
+          setCurrentIndex(nextIndex);
+        }
+      }
+    }
+    if (payLoad?.type === 'clear') {
+      const newAttempted = attempted?.filter((item: any) => item.questionId !== payLoad.questionId)
+      setAttempted(newAttempted)
+    }
+    if (payLoad?.type === 'switch') {
       if (pagerRef.current) {
-        pagerRef.current.setPage(payLoad.id);
+        pagerRef.current.setPage(payLoad.questionIndex);
       }
     }
     if (payLoad?.type === 'submit') {
-      console.log('submit', attempted)
+      setModalVisible(true);
+      const text = `Your responses are saved successfully!
+      Section,Attempted,Skipped,Total
+      ${mockTestName},${attempted?.length},${mockTestQuestions?.length - attempted?.length},${mockTestQuestions?.length}`
+      setConfirtText(text)
+      // console.log('submit', attempted)
     }
-    if (payLoad?.type === 'clear') {
-      console.log('clear')
-    }
-
   }
 
-
-
+  const handleConfirm = () => {
+    // setModalVisible(false);    
+    const attemptedQuestionIds = new Set(attempted.map((item: any) => item?.questionId));
+    const unattempted = mockTestQuestions
+      .filter((question: any) => !attemptedQuestionIds.has(question?.id))
+      .map((question: any) => question?.id);
+    console.log('attempted', attempted);
+    console.log('unattempted', unattempted.length);
+  }
 
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -87,6 +119,15 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
             />
           </View>
         </View>
+        <Pressable
+          onPress={() => {
+            const lang = language === 'hi' ? 'en' : 'hi'
+            setLanguage(lang)
+          }}
+          style={styles.language}
+        >
+          <Text style={styles.languageText}>{language?.toUpperCase()}</Text>
+        </Pressable>
         <View style={styles.sheetOpen}>
           <Pressable onPress={handlePresentModalPress}>
             <FontAwesome5 name="grip-horizontal" size={28} color="#E0115F" />
@@ -94,7 +135,14 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
         </View>
       </View>
 
-      <PagerView style={styles.pagerViewContainer} initialPage={0} ref={pagerRef}>
+      <PagerView
+        style={styles.pagerViewContainer}
+        initialPage={0}
+        ref={pagerRef}
+        onPageSelected={(e) => {
+          setCurrentIndex(e.nativeEvent.position);
+        }}
+      >
         {mockTestQuestions?.map((ques: any, questionIndex: number) => {
           return (
             <View key={questionIndex} style={styles.pagerViewContainer}>
@@ -103,50 +151,56 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
                 <Text style={styles.questionHeading}>Question</Text>
               </View>
               <View style={styles.question}>
-                <Text style={styles.questionText}>{ques.questionText}</Text>
+                <Text style={styles.questionText}>{ques?.questionText[language || 'en']}</Text>
               </View>
               <View style={styles.optionContainer}>
                 {
                   ques?.options?.map((option: any, optionIndex: number) => {
-                    const isSelected = attempted.find((item: any) => item?.questionId === ques?.id && item?.optionId === option?.id);
+                    const isSelected = attempted.find((item: any) => item?.questionId === ques?.id && item?.optionId === option?.optionId);
                     return (
-                      <Pressable key={optionIndex} onPress={() => { handleOptionClick(ques?.id, option?.id); }}>
+                      <Pressable key={optionIndex} onPress={() => { handleOptionClick(ques?.id, option?.optionId); }}>
                         <View style={[isSelected ? styles.selectedOption : styles.option]}>
                           <Text style={styles.optionNumber}>{['A', 'B', 'C', 'D'][optionIndex]}</Text>
-                          <Text style={isSelected ? styles.selectedOptionText : styles.optionText}>{option.text}</Text>
+                          <Text style={isSelected ? styles.selectedOptionText : styles.optionText}>{option?.optionText[language || 'en']}</Text>
                         </View>
                       </Pressable>
                     )
                   })
                 }
               </View>
-              <View style={styles.buttonContainer}>
-                <Pressable
-                  style={styles.clearButton}
-                  onPress={() => { handleResponse({ type: 'clear', id: ques?.id }) }}
-                >
-                  <Text style={styles.clearText}>
-                    Clear Response
-                  </Text>
-                </Pressable>
-                <Pressable
-                  style={styles.submitButton}
-                  onPress={() => {
-                    handleResponse({
-                      type: mockTestQuestions?.length === questionIndex + 1 ? 'submit' : 'next',
-                      id: ques?.id
-                    })
-                  }}
-                >
-                  <Text style={styles.submitText}>
-                    {mockTestQuestions?.length === questionIndex + 1 ? 'Submit' : 'Next'}
-                  </Text>
-                </Pressable>
-              </View>
             </View>
           )
         })}
       </PagerView>
+
+      <View style={styles.buttonContainer}>
+        <Pressable
+          style={styles.clearButton}
+          onPress={() => {
+            handleResponse({
+              type: 'clear',
+              questionId: mockTestQuestions[currentIndex]?.id,
+            })
+          }}
+        >
+          <Text style={styles.clearText}>
+            Clear Response
+          </Text>
+        </Pressable>
+        <Pressable
+          style={styles.submitButton}
+          onPress={() => {
+            handleResponse({
+              type: currentIndex === mockTestQuestions.length - 1 ? 'submit' : 'next',
+            })
+          }}
+        >
+          <Text style={styles.submitText}>
+            {/* {'Next'} */}
+            {currentIndex === mockTestQuestions.length - 1 ? 'Submit' : 'Next'}
+          </Text>
+        </Pressable>
+      </View>
 
       <BottomSheetModalProvider>
         <View style={styles.bsContainer}>
@@ -156,19 +210,63 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
             snapPoints={snapPoints}
             onChange={handleSheetChanges}
             backgroundStyle={styles.modalBackground}
+
           >
             <ScrollView showsVerticalScrollIndicator={false}>
               <BottomSheetView style={styles.bsItemContainer}>
-                {Array.from({ length: 100 }, (_, index) => (
-                  <View key={index} style={styles.bsItem}>
-                    <Text>{index + 1}</Text>
-                  </View>
-                ))}
+                {mockTestQuestions.map((question: any, questionIndex: number) => {
+                  const isAttempted = attempted.find((item: any) => item?.questionId === question?.id);
+                  return (
+                    <Pressable
+                      key={questionIndex}
+                      onPress={() => {
+                        handleResponse({
+                          type: 'switch',
+                          questionId: question?.id,
+                          questionIndex: questionIndex
+                        })
+                      }}
+                      style={isAttempted ? styles.bsItemSelected : styles.bsItem}
+                    >
+                      <Text
+                        style={isAttempted ? styles.bsTextSelected : styles.bsText}
+                      >
+                        {questionIndex + 1}
+                      </Text>
+                    </Pressable>
+                  )
+                })}
               </BottomSheetView>
             </ScrollView>
+            <Pressable
+              onPress={() => {
+                handleResponse({
+                  type: 'submit'
+                })
+              }}
+              style={styles.bsButton}
+            >
+              <Text style={styles.bsBottonText}>Submit Test</Text>
+            </Pressable>
           </BottomSheetModal>
         </View>
       </BottomSheetModalProvider>
+
+      <ModalConfirm
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onConfirm={handleConfirm}
+        title='Test Summary'
+        message={
+          <View style={styles.textTableContainer}>
+            <TextTable
+              text={confirmText}
+            />
+          </View>
+        }
+        confirmActionText='Submit Test'
+        closeActionText='No'
+      />
 
     </View>
   )
@@ -197,6 +295,21 @@ const styles = StyleSheet.create({
   },
   timerContainer: {
     padding: 10,
+  },
+  language: {
+    // padding: 12,
+    justifyContent: 'space-evenly',
+  },
+  languageText: {
+    height: 20,
+    width: 24,
+    borderWidth: 1,
+    borderColor: '#E0115F',
+    borderRadius: 5,
+    fontWeight: 500,
+    fontSize: 12,
+    textAlign: 'center',
+    padding: 2
   },
   sheetOpen: {
     padding: 12,
@@ -313,7 +426,7 @@ const styles = StyleSheet.create({
   modalBackground: {
     elevation: 25,
     borderWidth: 0.5,
-    borderColor: '#E5E4E2'
+    borderColor: '#E5E4E2',
   },
   bsItemContainer: {
     flex: 1,
@@ -321,7 +434,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    padding: 10,
+    padding: 4,
   },
   bsItem: {
     width: '10%',
@@ -332,9 +445,95 @@ const styles = StyleSheet.create({
     margin: 5,
     justifyContent: 'center',
     alignItems: 'center',
-
   },
+  bsItemSelected: {
+    width: '10%',
+    height: 40,
+    borderWidth: 0.5,
+    borderRadius: 5,
+    margin: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'pink',
+    borderColor: 'white'
+  },
+  bsTextSelected: {
+    color: 'white'
+  },
+  bsText: {
+    color: 'black'
+  },
+  bsButton: {
+    padding: 8,
+    alignItems: 'center',
+    borderRadius: 4,
+    backgroundColor: '#f44336',
+    margin: 10,
+    marginTop: 16,
+    marginBottom: 16
+  },
+  bsBottonText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 500
+  },
+  textTableContainer: {
+    width: 300,
+  }
 });
 
 export default TestRoom
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{/* <View style={styles.buttonContainer}>
+                <Pressable
+                  style={styles.clearButton}
+                  onPress={() => {
+                    handleResponse({
+                      type: 'clear',
+                      questionId: ques?.id,
+                      questionIndex: questionIndex + 1
+                    })
+                  }}
+                >
+                  <Text style={styles.clearText}>
+                    Clear Response
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={styles.submitButton}
+                  onPress={() => {
+                    handleResponse({
+                      type: mockTestQuestions?.length === questionIndex + 1 ? 'submit' : 'next',
+                      questionId: ques?.id,
+                      questionIndex: questionIndex + 1
+                    })
+                  }}
+                >
+                  <Text style={styles.submitText}>
+                    {mockTestQuestions?.length === questionIndex + 1 ? 'Submit' : 'Next'}
+                  </Text>
+                </Pressable>
+              </View> */}
 

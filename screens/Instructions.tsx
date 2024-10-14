@@ -8,11 +8,10 @@ import TextTable from '../components/TextTable';
 const Instructions = ({ route }: { route: any }) => {
   const navigation: any = useNavigation();
   const { selectedTest } = route.params;
-  const id = selectedTest?.id
+  const testId = selectedTest?.id
   const dispatch = useAppDispatch();
-  const questions = useAppSelector((state) => state.mockTest)
-
-
+  const { data, isLoading, error } = useAppSelector((state) => state.mockTest)
+ 
   const text = `Instructions:-
   Instruction for your examination is bellow:
   Section Name,No. of Question,Marks,Negative Marks,Positive Marks
@@ -22,9 +21,9 @@ const Instructions = ({ route }: { route: any }) => {
   3) However, there will be sectional timing for this exam. You must complete each section within the specified time limit. Before moving on to the next section, you must finish the current one within the allotted time.`;
 
   const onConfirm = async () => {
-    console.log(selectedTest)
-    await dispatch(fetchMockTest())
-    navigation.navigate('TestRoom', { id });
+    // console.log(testId)
+    await dispatch(fetchMockTest(testId))
+    navigation.navigate('TestRoom', { selectedTest:selectedTest });
   };
 
   return (
@@ -32,8 +31,18 @@ const Instructions = ({ route }: { route: any }) => {
       <TextTable
         text={text}
       />
-      <TouchableOpacity style={styles.button} onPress={onConfirm}>
-        <Text style={styles.buttonText}>{questions?.isLoading ? 'Loading...' : 'Start Test'}</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={onConfirm}
+      >
+        <Text
+          style={styles.buttonText}
+        >
+          {isLoading
+            ? 'Loading...'
+            :
+            'Start Test'}
+        </Text>
       </TouchableOpacity>
     </View>
   );

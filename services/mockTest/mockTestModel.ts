@@ -5,16 +5,6 @@ const gModel = new globalModel();
 
 export default class mockTestModel {
 
- fetchOne = async (): Promise<any> => {
-  try {
-   const response = await ApiProvider.mockTest()
-   await new Promise(resolve => setTimeout(resolve, 3000));
-   return response
-  } catch (error) {
-   console.log(error)
-  }
- }
-
  fetchList = async (examId: string): Promise<any> => {
   try {
    const listRes = await ApiProvider.list(examId)
@@ -46,11 +36,11 @@ export default class mockTestModel {
     }
     const listData = data && data.map((val: any) => {
      return createdData(
-      val._id, 
+      val._id,
       val.test_name,
-      `${val.total_questions} Ques`,
-      `${gModel.convertMillisecondsToTime(val.test_duration)}`,
-      `${val.total_marks} Marks`,
+      val.total_questions,
+      val.test_duration,
+      val.total_marks,
       val.positive_mark,
       val.negative_mark,
       'pending',
@@ -59,6 +49,45 @@ export default class mockTestModel {
     })
     return { listData }
    }
+  } catch (error) {
+   console.log(error)
+  }
+ }
+
+ fetchOne = async (testId: string): Promise<any> => {
+  try {
+   const testRes = await ApiProvider.findOne(testId)
+   const test = await testRes.json();
+   if (test?.status === 'success') {
+    const data = test?.data
+    function createdData(
+     id: string | number,
+     testId:string | number,
+     questionText: {hi:string, en:string},
+     options:{ option_text: { hi: string; en: string }; _id: string; option_id: number; isCorrect: boolean }[]
+    ) {
+     return {
+      id,
+      testId,
+      questionText,
+      options: options.map((option:any) => ({
+       optionId: option.option_id,
+       optionText: option.option_text,
+       isCorrect: option.isCorrect,
+     })),
+     }
+    }
+    const questions = data && data.map((val:any)=>{
+     return createdData(
+      val._id,
+      val.test_id,
+      val.question_text,
+      val.options
+     )
+    })
+    // console.log(JSON.stringify(testData))
+    return {questions}
+   }   
   } catch (error) {
    console.log(error)
   }
