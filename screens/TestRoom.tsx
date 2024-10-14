@@ -3,7 +3,7 @@ import React, { useCallback, useMemo, useRef, useState } from 'react'
 import PagerView from 'react-native-pager-view';
 import CountDown from '../components/CountDown';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import { useAppSelector } from '../services/redux/hooks';
+import { useAppDispatch, useAppSelector } from '../services/redux/hooks';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
 import {
@@ -14,10 +14,12 @@ import {
 import { ScrollView } from 'react-native-gesture-handler';
 import ModalConfirm from '../components/modals/ModalConfirm';
 import TextTable from '../components/TextTable';
+import { submitMockTest } from '../services/redux/slices/mockTestSlice';
 
 
 const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
   const { selectedTest } = route.params;
+  const dispatch = useAppDispatch();
   const { data, isLoading, error } = useAppSelector((state) => state.mockTest)
   const mockTestQuestions = data?.questions
   const mockTestName = selectedTest?.title
@@ -82,15 +84,27 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
     }
   }
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     // setModalVisible(false);    
-    const attemptedQuestionIds = new Set(attempted.map((item: any) => item?.questionId));
-    const unattempted = mockTestQuestions
-      .filter((question: any) => !attemptedQuestionIds.has(question?.id))
-      .map((question: any) => question?.id);
-    console.log('attempted', attempted);
-    console.log('unattempted', unattempted.length);
+    const attemptedQuestionIds = new Set(attempted?.map((item: any) => item?.questionId));
+    const unattempted = mockTestQuestions?.
+    filter((question: any) => !attemptedQuestionIds?.
+    has(question?.id))?.
+    map((question: any) => question?.id);
+    const userId='6705f99ae1cc4e748759343a'
+    const testId='6705f65ee1cc4e7487593430'
+    if(attempted && unattempted){
+      const submitRes = await dispatch(submitMockTest({
+        userId:userId,
+        testId:testId,
+        attempted:attempted,
+        unattempted:unattempted,
+      }))
+      console.log(submitRes)
+    }
   }
+
+  console.log(useAppSelector((state) => state.mockTest))
 
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -191,13 +205,13 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
           style={styles.submitButton}
           onPress={() => {
             handleResponse({
-              type: currentIndex === mockTestQuestions.length - 1 ? 'submit' : 'next',
+              type: currentIndex === mockTestQuestions?.length - 1 ? 'submit' : 'next',
             })
           }}
         >
           <Text style={styles.submitText}>
             {/* {'Next'} */}
-            {currentIndex === mockTestQuestions.length - 1 ? 'Submit' : 'Next'}
+            {currentIndex === mockTestQuestions?.length - 1 ? 'Submit' : 'Next'}
           </Text>
         </Pressable>
       </View>
@@ -214,7 +228,7 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
           >
             <ScrollView showsVerticalScrollIndicator={false}>
               <BottomSheetView style={styles.bsItemContainer}>
-                {mockTestQuestions.map((question: any, questionIndex: number) => {
+                {mockTestQuestions?.map((question: any, questionIndex: number) => {
                   const isAttempted = attempted.find((item: any) => item?.questionId === question?.id);
                   return (
                     <Pressable

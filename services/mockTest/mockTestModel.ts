@@ -93,6 +93,16 @@ export default class mockTestModel {
   }
  }
 
+ submit = async (userId:string, testId:string, attempted:any, unattempted:any) => {
+  try {
+   const response = await ApiProvider.submission(userId, testId, attempted, unattempted)
+   const jsonRes = await response.json();
+   console.log(jsonRes)
+  } catch (error) {
+   console.log(error)
+  }
+ }
+
 }
 
 

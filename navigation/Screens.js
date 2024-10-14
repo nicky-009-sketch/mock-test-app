@@ -20,6 +20,8 @@ import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import TestRoom from '../screens/TestRoom';
 import Instructions from '../screens/Instructions';
 import CountDown from '../components/CountDown';
+import HomeScreen from '../modules/home/HomeScreen';
+import TestScreen from '../modules/mockTest/TestScreen';
 
 const isSession = true;
 
@@ -102,6 +104,21 @@ const BottomTabStack = () => {
       <Tab.Screen
         name='Tests'
         component={Tests}
+        options={{
+          headerShown: false,
+          tabBarLabelStyle: {
+            fontSize: 10,
+            fontWeight: 800,
+            marginBottom: 5
+          },
+          tabBarIcon: ({ color, size }) => (
+            <SimpleLineIcons name="notebook" size={22} color={color} />
+          )
+        }}
+      />
+       <Tab.Screen
+        name='TestScreen'
+        component={TestScreen}
         options={{
           headerShown: false,
           tabBarLabelStyle: {

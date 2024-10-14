@@ -14,7 +14,6 @@ export const fetchMockList = createAsyncThunk(
   }
 );
 
-
 export const fetchMockTest = createAsyncThunk(
   'mockTest/fetchMockTest',
   async (testId: string, thunkAPI) => {
@@ -23,6 +22,20 @@ export const fetchMockTest = createAsyncThunk(
       return response
     } catch (error) {
       return thunkAPI.rejectWithValue('Failed to fetch questions');
+    }
+  }
+);
+
+export const submitMockTest = createAsyncThunk(
+  'mockTest/submitMockTest',
+  async (responseData: { userId: string; testId: string; attempted: {questionId:string, optionId:string}[]; unattempted: string[] }, thunkAPI) => {
+    try {
+      const { userId, testId, attempted, unattempted } = responseData;
+      const response = await mtModel.submit(userId, testId, attempted, unattempted);
+      return response;
+    } catch (error:any) {
+      console.error('Error submitting mock test:', error);
+      return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to submit mock test');
     }
   }
 );
@@ -61,6 +74,19 @@ const mockTestSlice = createSlice({
         state.isLoading = false;
       })
       .addCase(fetchMockList.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      //handle submission test response
+      .addCase(submitMockTest.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(submitMockTest.fulfilled, (state, action) => {
+        state.data = action.payload;
+        state.isLoading = false;
+      })
+      .addCase(submitMockTest.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
