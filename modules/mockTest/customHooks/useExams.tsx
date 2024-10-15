@@ -5,7 +5,7 @@ import { fetchExams } from "../../../services/redux/slices/examSlice";
 const useExams = () => {
  const dispatch = useAppDispatch();
  const exams = useAppSelector(state => state.exams.data);
- const loading = useAppSelector(state => state.exams.loading);
+ const loading = useAppSelector(state => state.exams.isLoading);
  const error = useAppSelector(state => state.exams.error);
  const [index, setIndex] = useState(0);
  const routes = exams?.routes || [];

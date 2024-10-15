@@ -17,18 +17,20 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
 import Tests from '../screens/Tests';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import TestRoom from '../screens/TestRoom';
+// import TestRoom from '../screens/TestRoom';
 import Instructions from '../screens/Instructions';
 import CountDown from '../components/CountDown';
 import HomeScreen from '../modules/home/HomeScreen';
 import TestScreen from '../modules/mockTest/TestScreen';
+import TestInstructions from '../modules/mockTest/TestInstructions';
+import TestRoom from '../modules/mockTest/TestRoom';
 
 const isSession = true;
 
 const Screens = () => {
   const Stack = createStackNavigator();
   return (
-    <Stack.Navigator >
+    <Stack.Navigator>
       {!isSession ? (<>
         <Stack.Screen name='Onboarding' component={Onboarding} options={{ headerTransparent: true, headerShown: false }} />
         <Stack.Screen name='SignIn' component={SignIn} options={{ headerTransparent: true }} />
@@ -38,6 +40,8 @@ const Screens = () => {
         <>
           <Stack.Screen name='App' component={AppStack} options={{ headerShown: false }} />
           <Stack.Screen name='Instructions' component={Instructions} />
+          <Stack.Screen name='TestInstructions' component={TestInstructions} />
+          {/* <Stack.Screen name='TestRoom' component={TestRoom} options={{headerShown:false}} /> */}
           <Stack.Screen name='TestRoom' component={TestRoom} options={{headerShown:false}} />
           {/* <Stack.Screen name='Store' component={Profile} /> */}
         </>
@@ -124,7 +128,7 @@ const BottomTabStack = () => {
           tabBarLabelStyle: {
             fontSize: 10,
             fontWeight: 800,
-            marginBottom: 5
+            marginBottom: 5,
           },
           tabBarIcon: ({ color, size }) => (
             <SimpleLineIcons name="notebook" size={22} color={color} />

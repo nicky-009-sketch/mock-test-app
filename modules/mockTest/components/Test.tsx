@@ -64,10 +64,8 @@ const Test: React.FC<ITestDataTypeProps> = (props) => {
 
 const styles = StyleSheet.create({
  container: {
-  flex: 1,
-  padding: 5,
-  paddingLeft: 10,
-  paddingRight: 10,
+  // backgroundColor:'red',
+  marginTop:8
  },
  wrapper: {
   borderWidth: 0.5,
@@ -78,7 +76,7 @@ const styles = StyleSheet.create({
   alignItems: 'flex-start',
   padding: 10,
   position: 'relative',
-  marginBottom: 10,
+  // marginBottom: 10,
  },
  information: {
   flexDirection: 'row',

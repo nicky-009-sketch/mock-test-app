@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../services/redux/hooks";
 import { fetchMockList } from "../../../services/redux/slices/mockTestSlice";
+import { useNavigation } from '@react-navigation/native';
 
 const useTest = (examId: string) => {
  const dispatch = useAppDispatch();
- const mockTest = useAppSelector(state => state.mockTest.data.listData);
- const loading = useAppSelector(state => state.mockTest.loading);
+ const navigation:any = useNavigation();
+ const mockTest = useAppSelector(state => state?.mockTest?.data?.listData);
+ const loading = useAppSelector(state => state?.mockTest?.isLoading);
  const error = useAppSelector(state => state.mockTest.error);
  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
  const [testId, setTestId] = useState<string | null>(null);
@@ -19,6 +21,7 @@ const useTest = (examId: string) => {
 
  useEffect(() => {
   const fetchMockTestData = async () => {
+   if(!examId) return null
    try {
     await dispatch(fetchMockList(examId))
    } catch (err) {
@@ -36,10 +39,17 @@ const useTest = (examId: string) => {
  const onModalClose = () => setIsModalVisible(false);
 
  const onModelConfirm = () => {
-  console.log('confirmbox', testId)
+  setIsModalVisible(false)
+  navigation.navigate('TestInstructions', { testId: testId }); 
  }
 
- return { mockTest, loading, error, handleStart, modalData, isModalVisible, onModelConfirm, onModalClose };
+ const startTest = () => {
+  console.log('start test')
+  // await dispatch(fetchMockTest(testId))
+    navigation.navigate('TestRoom', { selectedTest:'selectedTest' });
+ }
+
+ return { mockTest, loading, error, handleStart, modalData, isModalVisible, onModelConfirm, onModalClose, startTest };
 }
 
 export default useTest;
