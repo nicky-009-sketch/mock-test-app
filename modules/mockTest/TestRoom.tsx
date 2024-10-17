@@ -1,8 +1,5 @@
 import { View, Text, StyleSheet, Pressable } from 'react-native'
 import React from 'react'
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import CountDown from './components/CountDown';
 import useTestRoom from './customHooks/useTestRoom';
 import PagerView from 'react-native-pager-view';
 import { ScrollView } from 'react-native-gesture-handler';
@@ -11,68 +8,87 @@ import {
  BottomSheetView,
  BottomSheetModalProvider,
 } from '@gorhom/bottom-sheet';
+import Question from './components/Question';
+import Option from './components/Option';
+import RoomHeader from './components/RoomHeader';
+import RoomFooter from './components/RoomFooter';
+import ModalConfirm from '../../components/modals/ModalConfirm';
 
-const TestRoom: React.FC = () => {
- const { onTimeOut, language, changeLaguage, handleBottomSheet, pagerRef, bottomSheetModalRef, snapPoints } = useTestRoom();
+const TestRoom: React.FC<{route:any}> = ({route}) => {
+ const { selectedTestData:data } = route.params;
+
+ const {
+  onTimeOut,
+  language,
+  changeLaguage,
+  handleBottomSheet,
+  pagerRef,
+  bottomSheetModalRef,
+  snapPoints,
+  mockTestQuestions,
+  attempted,
+  handleOptionClick,
+  handleResponse,
+  currentIndex,
+  handelCurrentIndex,
+  handleModalConfirm,
+  handleModalVisible,
+  modalVisible
+ } = useTestRoom();
 
  return (
   <View style={styles.container}>
-   <View style={styles.headerContainer}>
-    <View style={styles.detailsContainer}>
-     <View style={styles.pause}>
-      <FontAwesome6 name="pause" size={28} color="#E0115F" />
-     </View>
-     <View style={styles.timerContainer}>
-      <CountDown
-       duration={5}
-       onTimeOut={onTimeOut}
-      />
-     </View>
-    </View>
-    <Pressable
-     onPress={() => {
-      const lang = language === 'hi' ? 'en' : 'hi'
-      changeLaguage(lang)
-     }}
-     style={styles.language}
-    >
-     <Text style={styles.languageText}>{language?.toUpperCase()}</Text>
-    </Pressable>
-    <View style={styles.sheetOpen}>
-     <Pressable onPress={handleBottomSheet}>
-      <FontAwesome5 name="grip-horizontal" size={28} color="#E0115F" />
-     </Pressable>
-    </View>
-   </View>
-
+   <RoomHeader
+    onTimeOut={onTimeOut}
+    language={language}
+    changeLaguage={changeLaguage}
+    handleBottomSheet={handleBottomSheet}
+    duration={data?.duration}
+    title={data?.title}
+   />
    <PagerView
     style={styles.pagerViewContainer}
     initialPage={0}
     ref={pagerRef}
-    // onPageSelected={(e) => {
-    //  setCurrentIndex(e.nativeEvent.position);
-    // }}
+    onPageSelected={(e) => {
+     handelCurrentIndex(e.nativeEvent.position)
+    }}
    >
-    {/* {mockTestQuestions?.map((ques: any, questionIndex: number) => {
+    {mockTestQuestions?.map((
+     ques: any,
+     questionIndex: number
+    ) => {
      return (
-      <View key={questionIndex} style={styles.pagerViewContainer}>
-       <View style={styles.questionHeadingContainer}>
-        <Text style={styles.questionNumber}>{questionIndex + 1}</Text>
-        <Text style={styles.questionHeading}>Question</Text>
-       </View>
-       <View style={styles.question}>
-        <Text style={styles.questionText}>{ques?.questionText[language || 'en']}</Text>
-       </View>
+      <View
+       key={questionIndex}
+       style={styles.pagerViewContainer}
+      >
+       <Question
+        questionIndex={questionIndex}
+        questionText={ques?.questionText[language || 'en']}
+       />
        <View style={styles.optionContainer}>
         {
-         ques?.options?.map((option: any, optionIndex: number) => {
-          const isSelected = attempted.find((item: any) => item?.questionId === ques?.id && item?.optionId === option?.optionId);
+         ques?.options?.map((
+          option: any,
+          optionIndex: number
+         ) => {
+          const isSelected = attempted.
+           find((item: any) =>
+            item?.questionId === ques?.id &&
+            item?.optionId === option?.optionId);
           return (
-           <Pressable key={optionIndex} onPress={() => { handleOptionClick(ques?.id, option?.optionId); }}>
-            <View style={[isSelected ? styles.selectedOption : styles.option]}>
-             <Text style={styles.optionNumber}>{['A', 'B', 'C', 'D'][optionIndex]}</Text>
-             <Text style={isSelected ? styles.selectedOptionText : styles.optionText}>{option?.optionText[language || 'en']}</Text>
-            </View>
+           <Pressable
+            key={optionIndex}
+            onPress={() => {
+             handleOptionClick(ques?.id, option?.optionId)
+            }}
+           >
+            <Option
+             optionIndex={optionIndex}
+             isSelected={isSelected}
+             optionText={option?.optionText[language || 'en']}
+            />
            </Pressable>
           )
          })
@@ -80,36 +96,9 @@ const TestRoom: React.FC = () => {
        </View>
       </View>
      )
-    })} */}
+    })}
    </PagerView>
-
-   <View style={styles.buttonContainer}>
-    <Pressable
-     style={styles.clearButton}
-     // onPress={() => {
-     //  handleResponse({
-     //   type: 'clear',
-     //   questionId: mockTestQuestions[currentIndex]?.id,
-     //  })
-     // }}
-    >
-     <Text style={styles.clearText}>
-      Clear Response
-     </Text>
-    </Pressable>
-    <Pressable
-     style={styles.submitButton}
-     // onPress={() => {
-     //  handleResponse({
-     //   type: currentIndex === mockTestQuestions?.length - 1 ? 'submit' : 'next',
-     //  })
-     // }}
-    >
-     <Text style={styles.submitText}>
-      {/* {currentIndex === mockTestQuestions?.length - 1 ? 'Submit' : 'Next'} */}
-     </Text>
-    </Pressable>
-   </View>
+   <RoomFooter />
 
    <BottomSheetModalProvider>
     <View style={styles.bsContainer}>
@@ -117,14 +106,16 @@ const TestRoom: React.FC = () => {
       ref={bottomSheetModalRef}
       index={1}
       snapPoints={snapPoints}
-      // onChange={handleSheetChanges}
       backgroundStyle={styles.modalBackground}
-
      >
       <ScrollView showsVerticalScrollIndicator={false}>
-       {/* <BottomSheetView style={styles.bsItemContainer}>
-        {mockTestQuestions?.map((question: any, questionIndex: number) => {
-         const isAttempted = attempted.find((item: any) => item?.questionId === question?.id);
+       <BottomSheetView style={styles.bsItemContainer}>
+        {mockTestQuestions?.map((
+         question: any,
+         questionIndex: number
+        ) => {
+         const isAttempted = attempted.
+          find((item: any) => item?.questionId === question?.id);
          return (
           <Pressable
            key={questionIndex}
@@ -135,47 +126,49 @@ const TestRoom: React.FC = () => {
              questionIndex: questionIndex
             })
            }}
-           style={isAttempted ? styles.bsItemSelected : styles.bsItem}
+           style={isAttempted ?
+            styles.bsItemSelected :
+            styles.bsItem}
           >
            <Text
-            style={isAttempted ? styles.bsTextSelected : styles.bsText}
+            style={isAttempted ?
+             styles.bsTextSelected :
+             styles.bsText}
            >
             {questionIndex + 1}
            </Text>
           </Pressable>
          )
         })}
-       </BottomSheetView> */}
+       </BottomSheetView>
       </ScrollView>
       <Pressable
-       // onPress={() => {
-       //  handleResponse({
-       //   type: 'submit'
-       //  })
-       // }}
+       onPress={() => {
+        handleResponse({
+         type: 'submit'
+        })
+       }}
        style={styles.bsButton}
       >
-       <Text style={styles.bsBottonText}>Submit Test</Text>
+       <Text
+        style={styles.bsBottonText}
+       >
+        Submit Test
+       </Text>
       </Pressable>
      </BottomSheetModal>
     </View>
    </BottomSheetModalProvider>
 
-   {/* <ModalConfirm
+   <ModalConfirm
     visible={modalVisible}
-    onClose={() => setModalVisible(false)}
-    onConfirm={handleConfirm}
+    onClose={handleModalVisible}
+    onConfirm={handleModalConfirm}
     title='Test Summary'
-    message={
-     <View style={styles.textTableContainer}>
-      <TextTable
-       text={confirmText}
-      />
-     </View>
-    }
+    message={'sure to submit'}
     confirmActionText='Submit Test'
     closeActionText='No'
-   /> */}
+   />
 
   </View>
  )

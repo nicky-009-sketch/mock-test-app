@@ -3,14 +3,14 @@ import React from 'react'
 import useTest from './customHooks/useTest';
 
 const TestInstructions: React.FC<{ route: any }> = ({ route }) => {
- const { testId } = route.params;
- const { startTest } = useTest(testId)
-
+ const { selectedTestData } = route.params;
+ const { startTest } = useTest()
+ 
  return (
   <View style={styles.container}>
    <TouchableOpacity
     style={styles.button}
-    onPress={startTest}
+    onPress={()=>{startTest(selectedTestData)}}
    >
     <Text
      style={styles.buttonText}

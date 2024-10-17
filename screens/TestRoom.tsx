@@ -167,7 +167,7 @@ const TestRoom = ({ route, navigation }: { route: any, navigation: any }) => {
               <View style={styles.question}>
                 <Text style={styles.questionText}>{ques?.questionText[language || 'en']}</Text>
               </View>
-              <View style={styles.optionContainer}>
+              <View style={styles.optionContainer}> 
                 {
                   ques?.options?.map((option: any, optionIndex: number) => {
                     const isSelected = attempted.find((item: any) => item?.questionId === ques?.id && item?.optionId === option?.optionId);

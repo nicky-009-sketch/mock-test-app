@@ -7,10 +7,8 @@ const CountDown: React.FC<{duration:number, onTimeOut:any}> = ({duration, onTime
 
  return (
   <View style={styles.container}>
-   {/* <Text style={styles.subjectText}>{subject}</Text> */}
    <View style={styles.timer}>
     <Text style={styles.timerHeading}>Total time left:</Text>
-    {/* <Text style={styles.timerText}>{`${hours}h ${minutes}m ${seconds}s`}</Text> */}
     <Text style={styles.timerText}>{timer}</Text>
    </View>
   </View>

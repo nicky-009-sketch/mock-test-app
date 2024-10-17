@@ -97,9 +97,9 @@ export default class mockTestModel {
   try {
    const response = await ApiProvider.submission(userId, testId, attempted, unattempted)
    const jsonRes = await response.json();
-   console.log(jsonRes)
+   return jsonRes
   } catch (error) {
-   console.log(error)
+    throw error
   }
  }
 

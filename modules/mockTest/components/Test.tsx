@@ -16,6 +16,7 @@ interface ITestDataTypeProps {
 
 const Test: React.FC<ITestDataTypeProps> = (props) => {
  const { id, handleStart, subject, title, questions, duration, totalMarks, coins } = props;
+ const testData = {id,subject,title,questions,duration,totalMarks,coins};
  return (
   <View
    style={styles.container}
@@ -44,7 +45,7 @@ const Test: React.FC<ITestDataTypeProps> = (props) => {
     </View>
     <View style={styles.download}>
      <Pressable
-      onPress={() => { handleStart(id) }}
+      onPress={() => { handleStart(testData) }}
      >
       <Text style={styles.downloadText}>Start</Text>
      </Pressable>

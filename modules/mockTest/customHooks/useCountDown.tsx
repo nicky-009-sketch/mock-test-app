@@ -34,7 +34,7 @@ const useContDown = (duration: number, onTimeOut: any) => {
  const hours = Math.floor(timeRemaining / 3600);
  const minutes = Math.floor((timeRemaining % 3600) / 60);
  const seconds = timeRemaining % 60;
- const timer = `${hours} ${minutes} ${seconds}`
+ const timer = `${hours}h ${minutes}m ${seconds}s`
 
  return { timer }
 }
