@@ -3,7 +3,7 @@ import { mockTestData } from "../../data/mockTest"
 export default class apiProvider {
  list = async (examId: string): Promise<any> => {
   try {
-   const url = 'http://192.168.0.119:9721/nodeapi/mock/exam-tests';
+   const url = 'http://192.168.0.108:9721/nodeapi/mock/exam-tests';
    const config:any = {
     method: 'POST', 
     headers: { 'Content-Type': 'application/json' },
@@ -23,7 +23,7 @@ export default class apiProvider {
 
  findOne = async (testId: string): Promise<any> => {
   try {
-   const url = 'http://192.168.0.119:9721/nodeapi/question/test-questions';
+   const url = 'http://192.168.0.108:9721/nodeapi/question/test-questions';
    const config:any = {
     method: 'POST', 
     headers: { 'Content-Type': 'application/json' },
@@ -43,7 +43,7 @@ export default class apiProvider {
 
  submission = async (userId:string, testId:string, attempted:any, unattempted:any): Promise<any> => {
   try {
-   const url = 'http://192.168.0.119:9721/nodeapi/mock/submission';
+   const url = 'http://192.168.0.108:9721/nodeapi/mock/submission';
    const config:any = {
     method: 'POST', 
     headers: { 'Content-Type': 'application/json' },
