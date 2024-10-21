@@ -4,7 +4,7 @@ const sp = new storageProvider();
 export default class storageModel {
 
  setTokenToLocal = async (value: string): Promise<void> => {
-  await sp.setStorage('userToken', value);
+   sp.setStorage('userToken', value);
  }
 
  getTokenFromLocal = async (): Promise<any> => {

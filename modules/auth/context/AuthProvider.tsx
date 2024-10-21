@@ -10,12 +10,12 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
- const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+ const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
  const localStorage = new storageModel();
 
  useEffect(() => {
   const checkAuth = async () => {
-   const token = await localStorage.getTokenFromLocal();
+   const token = await localStorage?.getTokenFromLocal();
    setIsAuthenticated(!!token)
   };
   checkAuth();

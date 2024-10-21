@@ -30,11 +30,11 @@ import { useAuthProvider } from '../modules/auth/context/AuthProvider';
 import SendOtpScreen from '../modules/auth/SendOtpScreen';
 
 const Screens = () => {
- const {isAuthenticated} = useAuthProvider();
+ // const { isAuthenticated } = useAuthProvider();
  const Stack = createStackNavigator();
  return (
   <Stack.Navigator>
-   {!isAuthenticated ? (<>
+   {!true ? (<>
     <Stack.Screen
      name='OnboardingScreen'
      component={OnBoardingScreen}
@@ -151,7 +151,7 @@ const BottomTabStack = () => {
  const Tab = createBottomTabNavigator();
  return (
   <Tab.Navigator
-   initialRouteName="Home"
+   initialRouteName="HomeScreen"
    screenOptions={{
     tabBarStyle: {
      height: 56,
@@ -160,8 +160,8 @@ const BottomTabStack = () => {
    }}
   >
    <Tab.Screen
-    name='Home'
-    component={Home}
+    name='HomeScreen'
+    component={HomeScreen}
     options={{
      headerShown: false,
      tabBarLabelStyle: {
@@ -178,7 +178,9 @@ const BottomTabStack = () => {
        color={color}
        size={size}
       />
-     )
+     ),
+     tabBarActiveTintColor: 'rgb(239 68 68)',
+     tabBarInactiveTintColor: 'rgb(163 163 163)'
     }}
    />
    <Tab.Screen
@@ -200,7 +202,9 @@ const BottomTabStack = () => {
        size={22}
        color={color}
       />
-     )
+     ),
+     tabBarActiveTintColor: 'rgb(239 68 68)',
+     tabBarInactiveTintColor: 'rgb(163 163 163)'
     }}
    />
    <Tab.Screen
@@ -222,7 +226,9 @@ const BottomTabStack = () => {
        color={color}
        size={22}
       />
-     )
+     ),
+     tabBarActiveTintColor: 'rgb(239 68 68)',
+     tabBarInactiveTintColor: 'rgb(163 163 163)'
     }}
    />
    <Tab.Screen
@@ -244,7 +250,9 @@ const BottomTabStack = () => {
        color={color}
        size={size}
       />
-     )
+     ),
+     tabBarActiveTintColor: 'rgb(239 68 68)',
+     tabBarInactiveTintColor: 'rgb(163 163 163)'
     }}
    />
   </Tab.Navigator>

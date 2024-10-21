@@ -1,48 +1,217 @@
 import { View, Text, ScrollView, StyleSheet } from 'react-native'
 import React from 'react'
-import AntDesign from '@expo/vector-icons/AntDesign';
-import Exam from './components/Exam';
+import Test from './components/Test';
 
 const HomeScreen: React.FC = () => {
- const exams = [
-  { id: 1, name: 'SSC', Icon: <AntDesign name="book" size={28} color="#3b82f6" /> },
-  { id: 2, name: 'SSC', Icon: <AntDesign name="book" size={28} color="#3b82f6" /> },
-  { id: 4, name: 'SSC', Icon: <AntDesign name="book" size={28} color="#3b82f6" /> },
-  { id: 5, name: 'SSC', Icon: <AntDesign name="book" size={28} color="#3b82f6" /> },
-  { id: 6, name: 'SSC', Icon: <AntDesign name="book" size={28} color="#3b82f6" /> },
-  { id: 7, name: 'SSC', Icon: <AntDesign name="book" size={28} color="#3b82f6" /> },
-  { id: 8, name: 'SSC', Icon: <AntDesign name="book" size={28} color="#3b82f6" /> },
-  { id: 9, name: 'SSC', Icon: <AntDesign name="book" size={28} color="#3b82f6" /> },
-  { id: 10, name: 'SSC', Icon: <AntDesign name="book" size={28} color="#3b82f6" /> },
- ]
- return (
-  <View style={styles.container}>
-   <View style={styles.examContainer}>
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} >
-     {exams.map((exam) => (
-      <View style={styles.exam} key={exam.id}>
-       <Exam name={exam.name} Icon={exam.Icon} />
-      </View>
-     ))}
-    </ScrollView>
-   </View>
-  </View>
- )
-}
+  const testData = [
+    {
+      subject: 'GS',
+      title: "General Knowledge",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+    {
+      subject: 'GS',
+      title: "General Knowledge",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+    {
+      subject: 'GS',
+      title: "General Knowledge",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+    {
+      subject: 'GS',
+      title: "General Knowledge",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    }
+  ];
+  const MathData = [
+    {
+      subject: 'M',
+      title: "Mathematics",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+    {
+      subject: 'M',
+      title: "Mathematics",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+    {
+      subject: 'M',
+      title: "Mathematics",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+    {
+      subject: 'M',
+      title: "Mathematics",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+  ];
 
-const styles = StyleSheet.create({
- container: {
- },
- examContainer: {
-   borderBottomWidth:0.2,
-   borderColor:'gray',
-   paddingTop:10, 
-   paddingBottom:10
- },
- exam: {
-   margin: 1,
-   padding: 4,
- }
-});
+  const scienceData = [
+    {
+      subject: 'SC',
+      title: "SCIENCE",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+    {
+      subject: 'SC',
+      title: "SCIENCE",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+    {
+      subject: 'SC',
+      title: "SCIENCE",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+    {
+      subject: 'SC',
+      title: "SCIENCE",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+    {
+      subject: 'SC',
+      title: "SCIENCE",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+  ];
+
+  const polityData = [
+    {
+      subject: 'P',
+      title: "POLITY",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+    {
+      subject: 'P',
+      title: "POLITY",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+    {
+      subject: 'P',
+      title: "POLITY",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+    {
+      subject: 'P',
+      title: "POLITY",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+    {
+      subject: 'P',
+      title: "POLITY",
+      description: "A test on basic algebra and geometry.",
+      date: "2023-10-15",
+      duration: 60,
+      questions: 10
+    },
+  ]
+
+
+  return (
+    <View className='min-h-full'>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View className='bg-slate-100 pt-6 pb-6 border-b border-slate-200'>
+          <View className='flex flex-row justify-between item-center p-3'>
+            <Text className='text-lg font-bold'>GS Quiz</Text>
+            <Text className='text-blue-500'>See All {'>'}</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {testData.map((test, index) => (
+              <Test key={index} testDetails={test} />
+            ))}
+          </ScrollView>
+        </View>
+
+        <View className='bg-slate-100 pt-6 pb-6 border-b border-slate-200'>
+          <View className='flex flex-row justify-between item-center p-3'>
+            <Text className='text-lg font-bold'>Math Quiz</Text>
+            <Text className='text-blue-500'>See All {'>'}</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {MathData.map((test, index) => (
+              <Test key={index} testDetails={test} />
+            ))}
+          </ScrollView>
+        </View>
+
+        <View className='bg-slate-100 pt-6 pb-6 border-b border-slate-200'>
+          <View className='flex flex-row justify-between item-center p-3'>
+            <Text className='text-lg font-bold'>Science Quiz</Text>
+            <Text className='text-blue-500'>See All {'>'}</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {scienceData.map((test, index) => (
+              <Test key={index} testDetails={test} />
+            ))}
+          </ScrollView>
+        </View>
+        <View className='bg-slate-100 pt-6 pb-6 border-b border-slate-200'>
+          <View className='flex flex-row justify-between item-center p-3'>
+            <Text className='text-lg font-bold'>Polity Quiz</Text>
+            <Text className='text-blue-500'>See All {'>'}</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            {polityData.map((test, index) => (
+              <Test key={index} testDetails={test} />
+            ))}
+          </ScrollView>
+        </View>
+
+      </ScrollView>
+    </View>
+  )
+}
 
 export default HomeScreen

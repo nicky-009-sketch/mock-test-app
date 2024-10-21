@@ -27,7 +27,7 @@ const useAuth = () => {
   const resStatus = response?.payload?.status || 'failed';
   if (resStatus === 'success') {
    showToast(resMessage);
-   navigateToSignIn();
+   // navigateToSignIn();
   } else {
    showToast('Something went wrong!')
   }
@@ -42,7 +42,7 @@ const useAuth = () => {
    await localStorage.setTokenToLocal(token);
    logIn();
    showToast(message!);
-   navigateToApp();
+   // navigateToApp();
   } else {
    showToast('Something weng wrong!')
   }
@@ -52,7 +52,7 @@ const useAuth = () => {
   await localStorage.removeTokenFromLocal();
   logOut();
   showToast('signOut successfully!')
-  navigateToSentOtp();
+  // navigateToSentOtp();
  }
 
  useEffect(() => {
