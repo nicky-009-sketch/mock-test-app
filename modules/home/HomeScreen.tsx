@@ -1,8 +1,9 @@
-import { View, Text, ScrollView, StyleSheet } from 'react-native'
+import { View, Text, ScrollView } from 'react-native'
 import React from 'react'
 import Test from './components/Test';
 
-const HomeScreen: React.FC = () => {
+const HomeScreen: React.FC<any> = ({ navigation }) => {
+
   const testData = [
     {
       subject: 'GS',
@@ -71,7 +72,6 @@ const HomeScreen: React.FC = () => {
       questions: 10
     },
   ];
-
   const scienceData = [
     {
       subject: 'SC',
@@ -114,7 +114,6 @@ const HomeScreen: React.FC = () => {
       questions: 10
     },
   ];
-
   const polityData = [
     {
       subject: 'P',
@@ -158,7 +157,6 @@ const HomeScreen: React.FC = () => {
     },
   ]
 
-
   return (
     <View className='min-h-full'>
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -173,7 +171,6 @@ const HomeScreen: React.FC = () => {
             ))}
           </ScrollView>
         </View>
-
         <View className='bg-slate-100 pt-6 pb-6 border-b border-slate-200'>
           <View className='flex flex-row justify-between item-center p-3'>
             <Text className='text-lg font-bold'>Math Quiz</Text>
@@ -208,10 +205,10 @@ const HomeScreen: React.FC = () => {
             ))}
           </ScrollView>
         </View>
-
       </ScrollView>
     </View>
   )
 }
+
 
 export default HomeScreen

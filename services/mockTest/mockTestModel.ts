@@ -5,47 +5,43 @@ const gModel = new globalModel();
 
 export default class mockTestModel {
 
- fetchList = async (examId: string): Promise<any> => {
+ // const routes = [
+ //  { key: 'first', title: 'First' },
+ //  { key: 'second', title: 'Second' },
+ //  { key: 'third', title: 'Third' },
+ // ];
+
+ fetchCategories = async (examId: string): Promise<any> => {
   try {
-   const listRes = await ApiProvider.list(examId)
+   const categoriesRes = await ApiProvider.categories(examId)
+   const categories = await categoriesRes.json();
+   if (categories?.status === 'success') {
+    const data = categories?.data;
+    function createdData(key: string, title: string) {
+     return { key, title }
+    }
+    const routes = data && data?.map((val: any) => {
+     return createdData(val?._id, val?.name)
+    })
+    return { routes }
+   }
+   console.log('categories', categories, examId)
+  } catch (error) {
+   console.log(error)
+  }
+ }
+
+ fetchList = async (examId: string, categoryId:string): Promise<any> => {
+  try {
+   const listRes = await ApiProvider.list(examId, categoryId)
    const list = await listRes.json();
    if (list.status === 'success') {
     const data = list?.data
-    function createdData(
-     id: string | number,
-     title: string,
-     questions: number | string,
-     duration: string | number,
-     totalMarks: string | number,
-     positiveMarks: string | number,
-     negativeMarks: string | number,
-     subject: String,
-     coins: number | string
-    ) {
-     return {
-      id,
-      title,
-      questions,
-      duration,
-      totalMarks,
-      positiveMarks,
-      negativeMarks,
-      subject,
-      coins
-     }
+    function createdData(id: string | number, name: string, duration: string | number, marks: string | number) {
+     return { id, name, duration, marks }
     }
     const listData = data && data.map((val: any) => {
-     return createdData(
-      val._id,
-      val.test_name,
-      val.total_questions,
-      val.test_duration,
-      val.total_marks,
-      val.positive_mark,
-      val.negative_mark,
-      'pending',
-      10
-     )
+     return createdData(val._id, val.name, val.duration, val.marks)
     })
     return { listData }
    }
@@ -62,22 +58,22 @@ export default class mockTestModel {
     const data = test?.data
     function createdData(
      id: string | number,
-     testId:string | number,
-     questionText: {hi:string, en:string},
-     options:{ option_text: { hi: string; en: string }; _id: string; option_id: number; isCorrect: boolean }[]
+     testId: string | number,
+     questionText: { hi: string, en: string },
+     options: { option_text: { hi: string; en: string }; _id: string; option_id: number; isCorrect: boolean }[]
     ) {
      return {
       id,
       testId,
       questionText,
-      options: options.map((option:any) => ({
+      options: options.map((option: any) => ({
        optionId: option.option_id,
        optionText: option.option_text,
        isCorrect: option.isCorrect,
-     })),
+      })),
      }
     }
-    const questions = data && data.map((val:any)=>{
+    const questions = data && data.map((val: any) => {
      return createdData(
       val._id,
       val.test_id,
@@ -86,20 +82,20 @@ export default class mockTestModel {
      )
     })
     // console.log(JSON.stringify(testData))
-    return {questions}
-   }   
+    return { questions }
+   }
   } catch (error) {
    console.log(error)
   }
  }
 
- submit = async (userId:string, testId:string, attempted:any, unattempted:any) => {
+ submit = async (userId: string, testId: string, attempted: any, unattempted: any) => {
   try {
    const response = await ApiProvider.submission(userId, testId, attempted, unattempted)
    const jsonRes = await response.json();
    return jsonRes
   } catch (error) {
-    throw error
+   throw error
   }
  }
 

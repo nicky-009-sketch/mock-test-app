@@ -1,24 +1,16 @@
 import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
-// import Onboarding from '../screens/Onboarding';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import Home from '../screens/Home';
 import Profile from '../screens/Profile';
 import Components from '../screens/Components';
-import SignUp from '../screens/SignUp';
-import SignIn from '../screens/SignIn';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LeaderBoard from '../screens/LeaderBoard';
 import Store from '../screens/Store';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
 import Menu from './Menu';
-import { Text, TouchableOpacity, View } from 'react-native';
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
-import Tests from '../screens/Tests';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import Instructions from '../screens/Instructions';
-import CountDown from '../components/CountDown';
 import HomeScreen from '../modules/home/HomeScreen';
 import TestScreen from '../modules/mockTest/TestScreen';
 import TestInstructions from '../modules/mockTest/TestInstructions';
@@ -26,8 +18,15 @@ import TestRoom from '../modules/mockTest/TestRoom';
 import OnBoardingScreen from '../modules/auth/OnBoardingScreen';
 import SignInScreen from '../modules/auth/SignInScreen';
 import SignUpScreen from '../modules/auth/SignUpScreen';
-import { useAuthProvider } from '../modules/auth/context/AuthProvider';
 import SendOtpScreen from '../modules/auth/SendOtpScreen';
+import Header from './Header';
+const profile = {
+ image: "image",
+ name: "Rachel Brown",
+ email: 'rachelbrown@gmail.com'
+};
+// header: () => <Header navigation={navigation} />
+
 
 const Screens = () => {
  // const { isAuthenticated } = useAuthProvider();
@@ -35,63 +34,17 @@ const Screens = () => {
  return (
   <Stack.Navigator>
    {!true ? (<>
-    <Stack.Screen
-     name='OnboardingScreen'
-     component={OnBoardingScreen}
-     options={{
-      headerTransparent: true,
-      headerShown: false
-     }}
-    />
-    <Stack.Screen
-     name='SendOtpScreen'
-     component={SendOtpScreen}
-     options={{
-      headerTransparent: true,
-      title: 'SendOtp'
-     }}
-    />
-    <Stack.Screen
-     name='SignInScreen'
-     component={SignInScreen}
-     options={{
-      headerTransparent: true,
-      title: 'SignIn'
-     }}
-    />
-    <Stack.Screen
-     name='SignUpScreen'
-     component={SignUpScreen}
-     options={{
-      headerTransparent: true,
-      title: 'SingUp'
-     }}
-    />
+    <Stack.Screen name='OnboardingScreen' component={OnBoardingScreen} options={{ headerTransparent: true, headerShown: false }} />
+    <Stack.Screen name='SendOtpScreen' component={SendOtpScreen} options={{ headerTransparent: true, title: 'SendOtp' }} />
+    <Stack.Screen name='SignInScreen' component={SignInScreen} options={{ headerTransparent: true, title: 'SignIn' }} />
+    <Stack.Screen name='SignUpScreen' component={SignUpScreen} options={{ headerTransparent: true, title: 'SingUp' }} />
    </>
    ) : (
     <>
-     <Stack.Screen
-      name='App'
-      component={AppStack}
-      options={{
-       headerShown: false
-      }}
-     />
-     <Stack.Screen
-      name='Instructions'
-      component={Instructions}
-     />
-     <Stack.Screen
-      name='TestInstructions'
-      component={TestInstructions}
-     />
-     <Stack.Screen
-      name='TestRoom'
-      component={TestRoom}
-      options={{
-       headerShown: false
-      }}
-     />
+     <Stack.Screen name='App' component={AppStack} options={{ headerShown: false }} />
+     <Stack.Screen name='Instructions' component={Instructions} />
+     <Stack.Screen name='TestInstructions' component={TestInstructions} />
+     <Stack.Screen name='TestRoom' component={TestRoom} options={{ headerShown: false }} />
     </>
    )}
   </Stack.Navigator>
@@ -103,49 +56,11 @@ export default Screens
 const AppStack = () => {
  const Drawer = createDrawerNavigator();
  return (
-  <Drawer.Navigator
-   drawerContent={
-    (props) => <Menu
-     {...props}
-     profile={profile}
-    />
-   }
-  >
-   <Drawer.Screen
-    name='BottomTab'
-    component={BottomTabStack}
-    options={({ navigation }) => ({
-     drawerIcon: () => null,
-     title: null,
-     headerRight: () => {
-      return (
-       <TouchableOpacity
-        onPress={() => {
-         navigation.navigate('Store')
-        }}
-       >
-        <View className='p-2'>
-         <FontAwesome6
-          name="sack-dollar"
-          size={24}
-          color="#d3af37"
-         />
-        </View>
-       </TouchableOpacity>
-      )
-     },
-    })}
-   />
+  <Drawer.Navigator drawerContent={(props) => <Menu{...props} profile={profile} />}>
+   <Drawer.Screen name='BottomTab' component={BottomTabStack} options={({ navigation }) => ({ drawerIcon: () => null, title: null, headerShown: false })} />
   </Drawer.Navigator>
  )
 }
-
-const profile = {
- image: "image",
- name: "Rachel Brown",
- email: 'rachelbrown@gmail.com'
-};
-
 
 const BottomTabStack = () => {
  const Tab = createBottomTabNavigator();
@@ -162,50 +77,30 @@ const BottomTabStack = () => {
    <Tab.Screen
     name='HomeScreen'
     component={HomeScreen}
-    options={{
-     headerShown: false,
-     tabBarLabelStyle: {
-      fontSize: 10,
-      fontWeight: 800,
-      marginBottom: 5
-     },
-     tabBarIcon: ({
-      color,
-      size
-     }) => (
-      <AntDesign
-       name="home"
-       color={color}
-       size={size}
-      />
+    options={({ navigation }) => ({
+     title:'Home',
+     header: () => <Header navigation={navigation} />,
+     tabBarLabelStyle: { fontSize: 10, fontWeight: '800', marginBottom: 5 },
+     tabBarIcon: ({ color, size }) => (
+      <AntDesign name="home" color={color} size={size} />
      ),
      tabBarActiveTintColor: 'rgb(239 68 68)',
-     tabBarInactiveTintColor: 'rgb(163 163 163)'
-    }}
+     tabBarInactiveTintColor: 'rgb(163 163 163)',
+    })}
    />
    <Tab.Screen
-    name='Test'
+    name='TestScreen'
     component={TestScreen}
-    options={{
-     headerShown: false,
-     tabBarLabelStyle: {
-      fontSize: 10,
-      fontWeight: 800,
-      marginBottom: 5,
-     },
-     tabBarIcon: ({
-      color,
-      size
-     }) => (
-      <SimpleLineIcons
-       name="notebook"
-       size={22}
-       color={color}
-      />
+    options={({ navigation }) => ({
+     title:'Test',
+     header: () => <Header navigation={navigation} />,
+     tabBarLabelStyle: { fontSize: 10, fontWeight: '800', marginBottom: 5 },
+     tabBarIcon: ({ color, size }) => (
+      <SimpleLineIcons name="notebook" size={22} color={color} />
      ),
      tabBarActiveTintColor: 'rgb(239 68 68)',
-     tabBarInactiveTintColor: 'rgb(163 163 163)'
-    }}
+     tabBarInactiveTintColor: 'rgb(163 163 163)',
+    })}
    />
    <Tab.Screen
     name='LeaderBoard'

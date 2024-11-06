@@ -14,59 +14,53 @@ interface ITestDataTypeProps {
  coins: string | number
 }
 
-const Test: React.FC<ITestDataTypeProps> = (props) => {
- const { id, handleStart, subject, title, questions, duration, totalMarks, coins } = props;
- const testData = {id,subject,title,questions,duration,totalMarks,coins};
+// const Test: React.FC<ITestDataTypeProps> = (props) => {
+const Test: React.FC<any> = ({data,onStart}) => {
+ // const { id, handleStart, subject, title, questions, duration, totalMarks, coins } = props;
+ // const testData = {id,subject,title,questions,duration,totalMarks,coins};
+
+ // const handleStartTest = (testId:string) => {
+ //  console.log('test', testId)
+ // }
+
  return (
-  <View
-   style={styles.container}
-  >
-   <View style={styles.wrapper}>
-    <View style={styles.information}>
-     <View style={styles.iconContainer}>
-      <Text style={styles.iconText}>
-       <FontAwesome5
-        name="book-reader"
-        size={45}
-        color="#3b82f6"
-       />
-      </Text>
-      <Text style={styles.subjectText}>{subject}</Text>
-     </View>
-     <View style={styles.textContainer}>
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.subtitle}>{questions}</Text>
-      <View style={styles.detailsContainer}>
-       <Text style={styles.detailItem}>• {questions}</Text>
-       <Text style={styles.detailItem}>• {duration}</Text>
-       <Text style={styles.detailItem}>• {totalMarks}</Text>
+  data &&
+  <React.Fragment>
+   {data?.map((val: any, itemIndex: number) => {
+    return (
+     <View key={itemIndex} className='p-2 ps-5 pe-5'>
+      <View className='rounded-lg bg-white'>
+       <View className='p-4'>
+        <Text className='text-lg font-bold'>RRB NTPC General Awerness section test 1</Text>
+        <View className='flex-row justify-between mt-1'>
+         <View className='flex-row'>
+          <Text className='text-slate-400'>40 Qs.</Text>
+          <Text className='text-slate-400 ps-2 pe-2'>20 mins</Text>
+          <Text className='text-slate-400'>40 Marks</Text>
+         </View>
+         <Pressable onPress={() => { onStart(val?.id) }}>
+          <Text className='text-red-400 font-bold'>Start test</Text>
+         </Pressable>
+        </View>
+       </View>
+       <View className='bg-red-400 p-1 ps-4 rounded-b-lg'>
+        <Text className='text-white'>English, Hindi</Text>
+       </View>
       </View>
      </View>
-    </View>
-    <View style={styles.download}>
-     <Pressable
-      onPress={() => { handleStart(testData) }}
-     >
-      <Text style={styles.downloadText}>Start</Text>
-     </Pressable>
-    </View>
-    <View style={styles.coins}>
-     <FontAwesome5
-      name="coins"
-      size={14}
-      color="#d3af37"
-     />
-     <Text style={styles.coinsText}>{coins}</Text>
-    </View>
-   </View>
-  </View>
+    )
+   })}
+  </React.Fragment>
  );
 };
+
+
+
 
 const styles = StyleSheet.create({
  container: {
   // backgroundColor:'red',
-  marginTop:8
+  marginTop: 8
  },
  wrapper: {
   borderWidth: 0.5,
@@ -149,3 +143,49 @@ const styles = StyleSheet.create({
 });
 
 export default Test;
+
+
+
+// <View
+//  key={itemIndex}
+//  style={styles.container}
+// >
+//  <View style={styles.wrapper}>
+//   <View style={styles.information}>
+//    <View style={styles.iconContainer}>
+//     <Text style={styles.iconText}>
+//      <FontAwesome5
+//       name="book-reader"
+//       size={45}
+//       color="#3b82f6"
+//      />
+//     </Text>
+//     <Text style={styles.subjectText}>{'subject'}</Text>
+//    </View>
+//    <View style={styles.textContainer}>
+//     <Text style={styles.title}>{'title'}</Text>
+//     <Text style={styles.subtitle}>{'questions'}</Text>
+//     <View style={styles.detailsContainer}>
+//      <Text style={styles.detailItem}>• {'questions'}</Text>
+//      <Text style={styles.detailItem}>• {'duration'}</Text>
+//      <Text style={styles.detailItem}>• {'totalMarks'}</Text>
+//     </View>
+//    </View>
+//   </View>
+//   <View style={styles.download}>
+//    <Pressable
+//    // onPress={() => { handleStart(testData) }}
+//    >
+//     <Text style={styles.downloadText}>Start</Text>
+//    </Pressable>
+//   </View>
+//   <View style={styles.coins}>
+//    <FontAwesome5
+//     name="coins"
+//     size={14}
+//     color="#d3af37"
+//    />
+//    <Text style={styles.coinsText}>{'coins'}</Text>
+//   </View>
+//  </View>
+// </View>

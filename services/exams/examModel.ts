@@ -3,19 +3,19 @@ const ApiProvider = new apiProvider()
 
 export default class examModel {
 
- fetchAll = async (): Promise<any> => {
+ fetchList = async (): Promise<any> => {
   try {
    const listRes = await ApiProvider.list();
    const list = await listRes.json();
    if(list.status==='success'){
     const data = list?.data
-    function routesCreatedData(key:any, title:string){
-     return {key, title}
+    function routesCreatedData(id:any, examName:string){
+     return {id, examName}
     }
-    const routes = data && data.map((val:any)=>{
+    const examList = data && data.map((val:any)=>{
      return routesCreatedData(val._id, val.exam_name)
     })
-    return {routes}
+    return {examList}
    }
   } catch (error) {
    console.log(error)

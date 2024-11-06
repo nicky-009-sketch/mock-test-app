@@ -1,16 +1,24 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../services/redux/hooks";
-import { fetchMockList, fetchMockTest } from "../../../services/redux/slices/mockTestSlice";
+import { fetchMockList, fetchMockTest, fetchMockTestCategories } from "../../../services/redux/slices/mockTestSlice";
 import { useNavigation } from '@react-navigation/native';
+import { Text, View } from "react-native";
+import storageModel from "../../../services/localStorage/storageModel";
+import { SceneMap } from "react-native-tab-view";
+import Test from "../components/Test";
+const localStorageModel = new storageModel();
 
-const useTest = (examId?: string) => {
+const useTest = () => {
  const dispatch = useAppDispatch();
  const navigation: any = useNavigation();
- const mockTest = useAppSelector(state => state?.mockTest?.mockListData?.listData);
+ const mockTestList = useAppSelector(state => state?.mockTest?.mockListData?.listData);
+ const mockTestCategories = useAppSelector(state => state?.mockTest?.mockCategoriesData?.routes);
  const loading = useAppSelector(state => state?.mockTest?.isLoading);
  const error = useAppSelector(state => state.mockTest.error);
  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
  const [testId, setTestId] = useState<string | null>(null);
+ const [examId, setExamId] = useState<string | null>(null);
+ const [categoryId, setCategoryId] = useState<string | null>(null);
  const [selectedTestData, setSelectedTestData] = useState<{}>()
 
  const modalData = {
@@ -20,17 +28,17 @@ const useTest = (examId?: string) => {
   closeText: 'Not Now'
  }
 
- useEffect(() => {
-  const fetchMockTestData = async () => {
-   if (!examId) return null
-   try {
-    await dispatch(fetchMockList(examId))
-   } catch (err) {
-    console.error('Failed to fetch exams:', err);
-   }
-  };
-  fetchMockTestData();
- }, [examId]);
+ // useEffect(() => {
+ //  const fetchMockTestData = async () => {
+ //   if (!examId) return null
+ //   try {
+ //    await dispatch(fetchMockList(examId))
+ //   } catch (err) {
+ //    console.error('Failed to fetch exams:', err);
+ //   }
+ //  };
+ //  fetchMockTestData();
+ // }, [examId]);
 
  const handleStart = (data: any) => {
   // console.log(selectedTestData)
@@ -52,7 +60,40 @@ const useTest = (examId?: string) => {
   navigation.navigate('TestRoom', { selectedTestData: selectedTestData });
  }
 
- return { mockTest, loading, error, handleStart, modalData, isModalVisible, onModelConfirm, onModalClose, startTest };
+
+
+
+
+
+
+
+
+
+ 
+
+
+ useEffect(() => {
+  const getSelectedExam = async () => {
+   const selectedExam = await localStorageModel.getSelectedExamFromLocal()
+   const examId = selectedExam?.id
+   setExamId(examId)
+   dispatch(fetchMockTestCategories(examId))
+  }
+  getSelectedExam();
+ }, [])
+
+ const handleTabChange = (categoryId: string) => {
+  if (examId) {
+   setCategoryId(categoryId)
+   dispatch(fetchMockList({ examId: examId, categoryId: categoryId }))
+  }
+ }
+
+ const handleStartTest = (testId:string) => {
+  console.log('testId', testId)
+ }
+
+ return { mockTestList, loading, error, handleTabChange, mockTestCategories, handleStartTest };
 }
 
 export default useTest;

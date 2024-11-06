@@ -6,7 +6,7 @@ export const fetchExams = createAsyncThunk(
   'exam/fetchExams',
   async (_, thunkAPI) => {
     try {
-      const response = await exmModel.fetchAll();
+      const response = await exmModel.fetchList();
       return response
     } catch (error) {
       return thunkAPI.rejectWithValue('Failed to fetch questions');

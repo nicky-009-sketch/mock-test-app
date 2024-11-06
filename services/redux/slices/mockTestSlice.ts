@@ -2,14 +2,26 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import mockTestModel from '../../mockTest/mockTestModel';
 const mtModel = new mockTestModel()
 
-export const fetchMockList = createAsyncThunk(
-  'mockTest/fetchMockList',
+export const fetchMockTestCategories = createAsyncThunk(
+  'mockTest/fetchMockTestCategories',
   async (examId: string, thunkAPI) => {
     try {
-      const response = await mtModel.fetchList(examId);
+      const response = await mtModel.fetchCategories(examId);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue('Failed to fetchMockList');
+    }
+  }
+);
+
+export const fetchMockList = createAsyncThunk(
+  'mockTest/fetchMockList',
+  async ({ examId, categoryId }: { examId: string; categoryId: string }, thunkAPI) => {
+    try {
+      const response = await mtModel.fetchList(examId,categoryId);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue('Failed to fetch mock list');
     }
   }
 );
@@ -28,19 +40,20 @@ export const fetchMockTest = createAsyncThunk(
 
 export const submitMockTest = createAsyncThunk(
   'mockTest/submitMockTest',
-  async (responseData: { userId: string; testId: string; attempted: {questionId:string, optionId:string}[]; unattempted: string[] }, thunkAPI) => {
+  async (responseData: { userId: string; testId: string; attempted: { questionId: string, optionId: string }[]; unattempted: string[] }, thunkAPI) => {
     try {
       const { userId, testId, attempted, unattempted } = responseData;
       const response = await mtModel.submit(userId, testId, attempted, unattempted);
       return response;
-    } catch (error:any) {
+    } catch (error: any) {
       // console.error('Error submitting mock test:', error);
       return thunkAPI.rejectWithValue(error.response?.data?.message || 'Failed to submit mock test');
     }
   }
 );
 
-const initialState:any = {
+const initialState: any = {
+  mockCategoriesData: null,
   mockTestData: null,
   mockListData: null,
   submitResponse: null,
@@ -54,6 +67,20 @@ const mockTestSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // mock test categories
+      .addCase(fetchMockTestCategories.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchMockTestCategories.fulfilled, (state, action) => {
+        state.mockCategoriesData = action.payload;
+        state.isLoading = false;
+      })
+      .addCase(fetchMockTestCategories.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      //mock test list
       .addCase(fetchMockTest.pending, (state) => {
         state.isLoading = true;
         state.error = null;
