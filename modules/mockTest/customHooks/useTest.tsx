@@ -89,11 +89,14 @@ const useTest = () => {
   }
  }
 
- const handleStartTest = (testId:string) => {
-  console.log('testId', testId)
+ const handleStartTest = (selectedTest:any) => {
+  navigation.navigate('TestInstructions', { selectedTest: selectedTest });
+ }
+ const handleInstructionStart = (selectedTest:any) => {
+  console.log('ins', selectedTest)
  }
 
- return { mockTestList, loading, error, handleTabChange, mockTestCategories, handleStartTest };
+ return { mockTestList, loading, error, handleTabChange, mockTestCategories, handleStartTest, handleInstructionStart };
 }
 
 export default useTest;
